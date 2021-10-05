@@ -14,7 +14,7 @@ static void BM_Count(benchmark::State& state) {
 
   for (auto _ : state) {
     for (auto i=0; i < sz; i++) {
-      std::string key = "key" + std::to_string(std::rand() % sz);
+      std::string key = "key" + std::to_string(i);
       if(m.count(key)) {
         std::string val = m[key];
       }
@@ -33,7 +33,7 @@ static void BM_find(benchmark::State& state) {
 
   for (auto _ : state) {
     for (auto i=0; i < sz; i++) {
-      std::string key = "key" + std::to_string(std::rand() % sz);
+      std::string key = "key" + std::to_string(i);
       if(auto kv = m.find(key); kv != m.end()) {
         std::string val = kv->second;
       }
