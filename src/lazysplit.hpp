@@ -93,7 +93,10 @@ public:
 
 private:
   // we need to collapse the reference here, hence we have to return by value
+  template <typename T=delim_type,
+            std::enable_if_t<std::is_same_v<T,char>,bool> = true>
   base_string_type next(size_type start_pos) {
+    static_assert(std::is_same_v<delim_type,char>, "expected char!");
     // this loop is needed to advance past empty delims
     while (start_pos < str.size()) {
       pos = str.find_first_of(delim, start_pos);
@@ -106,6 +109,8 @@ private:
     return {};
   }
 
+  template <typename T=delim_type,
+            typename = std::enable_if_t<detail::has_const_iter_v<T>>>
   base_string_type next(size_type start_pos) {
     while (start_pos < str.size()) {
       auto p = std::find_first_of(str.cbegin()+start_pos, str.cend(),
