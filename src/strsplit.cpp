@@ -2,10 +2,12 @@
 #include <deque>
 #include <vector>
 #include <sstream>
+#include <cstring>
+#include <sstream>
+#include "split.h"
+#include "lazysplit.hpp"
 #include "benchmark/benchmark.h"
-
-namespace eos
-{
+#include <iostream>
 //----------------------------------------------------------------------------
 //! Helper class responsible for spliting the path
 //----------------------------------------------------------------------------
@@ -117,17 +119,17 @@ public:
     }
   }
 };
-}
 
 
-std::deque<std::string>
-insertChunksIntoDeque2(const std::string& path, char delim='/')
+std::vector<std::string>
+insertChunksIntoDeque2(std::string_view path, std::string_view delim="/")
 {
   size_t start_pos = 0;
   size_t end_pos = path.size();
-  std::deque<std::string> dq;
+  std::vector<std::string> dq;
+  //dq.reserve(end_pos / 2);
   while (start_pos < path.size() - 1) {
-    end_pos = path.find(delim, start_pos);
+    end_pos = path.find_first_of(delim, start_pos);
     if (end_pos == std::string::npos) {
       dq.emplace_back(path.substr(start_pos));
       break;
@@ -142,6 +144,39 @@ insertChunksIntoDeque2(const std::string& path, char delim='/')
   return dq;
 }
 
+inline std::vector<std::string> split(std::string data, std::string token)
+{
+  std::vector<std::string> output;
+  size_t pos = std::string::npos;
+
+  do {
+    pos = data.find(token);
+    output.push_back(data.substr(0, pos));
+
+    if (std::string::npos != pos) {
+      data = data.substr(pos + token.size());
+    }
+  } while (std::string::npos != pos);
+
+  return output;
+}
+
+template<typename C>
+C StringTokenizer_split(const std::string& str, char delimiter)
+{
+  std::istringstream iss(str);
+  C container;
+  std::string part;
+
+  while (std::getline(iss, part, delimiter)) {
+    if (!part.empty()) {
+      container.emplace_back(std::move(part));
+    }
+  }
+
+  return container;
+}
+
 static void BM_split(benchmark::State& state) {
   auto sz = state.range(0);
   std::string s = "/eos/";
@@ -152,7 +187,7 @@ static void BM_split(benchmark::State& state) {
   for (auto _: state) {
 
     std::deque<std::string> dq;
-    eos::PathProcessor::insertChunksIntoDeque(dq, s);
+    PathProcessor::insertChunksIntoDeque(dq, s);
   }
 }
 
@@ -167,6 +202,81 @@ static void BM_split2(benchmark::State& state) {
     auto dq2 = insertChunksIntoDeque2(s);
   }
 }
+
+static void BM_splitv(benchmark::State& state) {
+  auto sz = state.range(0);
+  std::string s = "/eos/";
+  for (auto i = 0; i< sz;i++) {
+    s += "folder" + std::to_string(i) + "/";
+  }
+
+  for (auto _: state) {
+    auto v = split(s,"/");
+  }
+}
+
+static void BM_split_t(benchmark::State& state) {
+  auto sz = state.range(0);
+  std::string s = "/eos/";
+  for (auto i = 0; i< sz;i++) {
+    s += "folder" + std::to_string(i) + "/";
+  }
+
+  for (auto _: state) {
+    auto v = StringTokenizer_split<std::vector<std::string>>(s,'/');
+  }
+}
+
+static void BM_splitc(benchmark::State& state) {
+  auto sz = state.range(0);
+  std::string s = "/eos/";
+  for (auto i = 0; i< sz;i++) {
+    s += "folder" + std::to_string(i) + "/";
+  }
+
+  for (auto _: state) {
+    auto parts = utils::split(s,"/");
+    std::vector<std::string> result;
+    result.assign(parts.begin(), parts.end());
+  }
+}
+
+static void BM_splite(benchmark::State& state) {
+  auto sz = state.range(0);
+  std::string s = "/eos/";
+  for (auto i = 0; i< sz;i++) {
+    s += "folder" + std::to_string(i) + "/";
+  }
+
+  for (auto _: state) {
+    auto parts = eos::common::LazySplit<std::string_view,std::string_view>(s, "/");
+
+    std::vector<std::string_view> result;
+    for (std::string_view it: parts) {
+      result.emplace_back(it);
+    }
+    //result.assign(parts.begin(), parts.end());
+  }
+}
+
+static void BM_splitec(benchmark::State& state) {
+  auto sz = state.range(0);
+  std::string s = "/eos/";
+  for (auto i = 0; i< sz;i++) {
+    s += "folder" + std::to_string(i) + "/";
+  }
+
+  for (auto _: state) {
+    auto parts = eos::common::LazySplit<std::string_view,std::string_view>(s, "/");
+
+    std::vector<std::string> result;
+    for (std::string_view it: parts) {
+      result.emplace_back(it);
+    }
+    //result.assign(parts.begin(), parts.end());
+  }
+}
+
 
 static void BM_CopyDeque(benchmark::State& state) {
   auto sz = state.range(0);
@@ -191,7 +301,11 @@ static void BM_MoveDeque(benchmark::State& state) {
 }
 
 
-BENCHMARK(BM_split)->DenseRange(1,32,1);
-BENCHMARK(BM_split2)->DenseRange(1,32,1);
-
+BENCHMARK(BM_split)->DenseRange(0,32,4);
+BENCHMARK(BM_split2)->DenseRange(0,32,4);
+BENCHMARK(BM_splitv)->DenseRange(0,32,4);
+BENCHMARK(BM_split_t)->DenseRange(0,32,4);
+BENCHMARK(BM_splitc)->DenseRange(0,32,4);
+BENCHMARK(BM_splite)->DenseRange(0,32,4);
+BENCHMARK(BM_splitec)->DenseRange(0,32,4);
 BENCHMARK_MAIN();
