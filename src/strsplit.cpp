@@ -177,7 +177,7 @@ C StringTokenizer_split(const std::string& str, char delimiter)
   return container;
 }
 
-static void BM_split(benchmark::State& state) {
+static void BM_path_processor_dq(benchmark::State& state) {
   auto sz = state.range(0);
   std::string s = "/eos/";
   for (auto i = 0; i< sz;i++) {
@@ -188,6 +188,19 @@ static void BM_split(benchmark::State& state) {
 
     std::deque<std::string> dq;
     PathProcessor::insertChunksIntoDeque(dq, s);
+  }
+}
+
+static void BM_path_processor_splitv(benchmark::State& state) {
+  auto sz = state.range(0);
+  std::string s = "/eos/";
+  for (auto i = 0; i< sz;i++) {
+    s += "folder" + std::to_string(i) + "/";
+  }
+
+  for (auto _: state) {
+    std::vector<std::string> v;
+    PathProcessor::splitPath(v,s);
   }
 }
 
@@ -203,7 +216,7 @@ static void BM_split2(benchmark::State& state) {
   }
 }
 
-static void BM_splitv(benchmark::State& state) {
+static void BM_fusex_split(benchmark::State& state) {
   auto sz = state.range(0);
   std::string s = "/eos/";
   for (auto i = 0; i< sz;i++) {
@@ -215,7 +228,7 @@ static void BM_splitv(benchmark::State& state) {
   }
 }
 
-static void BM_split_t(benchmark::State& state) {
+static void BM_tokenizer_split(benchmark::State& state) {
   auto sz = state.range(0);
   std::string s = "/eos/";
   for (auto i = 0; i< sz;i++) {
@@ -241,7 +254,7 @@ static void BM_splitc(benchmark::State& state) {
   }
 }
 
-static void BM_splite(benchmark::State& state) {
+static void BM_lazy_split_sv(benchmark::State& state) {
   auto sz = state.range(0);
   std::string s = "/eos/";
   for (auto i = 0; i< sz;i++) {
@@ -258,7 +271,7 @@ static void BM_splite(benchmark::State& state) {
   }
 }
 
-static void BM_splitec(benchmark::State& state) {
+static void BM_lazy_split_s(benchmark::State& state) {
   auto sz = state.range(0);
   std::string s = "/eos/";
   for (auto i = 0; i< sz;i++) {
@@ -340,13 +353,15 @@ static void BM_MoveDeque(benchmark::State& state) {
 }
 
 
-BENCHMARK(BM_split)->DenseRange(0,32,4);
-BENCHMARK(BM_split2)->DenseRange(0,32,4);
-BENCHMARK(BM_splitv)->DenseRange(0,32,4);
-BENCHMARK(BM_split_t)->DenseRange(0,32,4);
-BENCHMARK(BM_splitc)->DenseRange(0,32,4);
-BENCHMARK(BM_splite)->DenseRange(0,32,4);
-BENCHMARK(BM_splitec)->DenseRange(0,32,4);
+BENCHMARK(BM_path_processor_dq)->DenseRange(0,32,4);
+BENCHMARK(BM_path_processor_splitv)->DenseRange(0,32,4);
+BENCHMARK(BM_fusex_split)->DenseRange(0,32,4);
+BENCHMARK(BM_tokenizer_split)->DenseRange(0,32,4);
+BENCHMARK(BM_lazy_split_sv)->DenseRange(0,32,4);
+BENCHMARK(BM_lazy_split_s)->DenseRange(0,32,4);
 BENCHMARK(BM_splitenullc)->DenseRange(0,32,4);
 BENCHMARK(BM_splitenullsv)->DenseRange(0,32,4);
+//BENCHMARK(BM_split2)->DenseRange(0,32,4);
+//BENCHMARK(BM_splitc)->DenseRange(0,32,4);
+
 BENCHMARK_MAIN();
