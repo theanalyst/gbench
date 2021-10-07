@@ -255,7 +255,6 @@ static void BM_splite(benchmark::State& state) {
     for (std::string_view it: parts) {
       result.emplace_back(it);
     }
-    //result.assign(parts.begin(), parts.end());
   }
 }
 
@@ -267,9 +266,49 @@ static void BM_splitec(benchmark::State& state) {
   }
 
   for (auto _: state) {
-    auto parts = eos::common::LazySplit<std::string_view,std::string_view>(s, "/");
+    auto parts = eos::common::LazySplit<std::string_view,char>(s, '/');
 
-    std::vector<std::string> result;
+    std::vector<std::string_view> result;
+    for (std::string_view it: parts) {
+      result.emplace_back(it);
+    }
+    //result.assign(parts.begin(), parts.end());
+  }
+}
+
+static void BM_splitenullc(benchmark::State& state) {
+  auto sz = state.range(0);
+  std::string s = "/eos/";
+  for (auto i = 0; i< sz;i++) {
+    s += "folder" + std::to_string(i);
+    s += '\0';
+  }
+
+  for (auto _: state) {
+    auto parts = eos::common::LazySplit<std::string_view,char>(s, '\0');
+
+    std::vector<std::string_view> result;
+    for (std::string_view it: parts) {
+      result.emplace_back(it);
+    }
+    //result.assign(parts.begin(), parts.end());
+  }
+}
+
+static void BM_splitenullsv(benchmark::State& state) {
+  auto sz = state.range(0);
+  std::string s = "/eos/";
+  for (auto i = 0; i< sz;i++) {
+    s += "folder" + std::to_string(i);
+    s += '\0';
+  }
+  std::string nb;
+  nb += '\0';
+
+  for (auto _: state) {
+    auto parts = eos::common::LazySplit<std::string_view,std::string_view>(s, nb);
+
+    std::vector<std::string_view> result;
     for (std::string_view it: parts) {
       result.emplace_back(it);
     }
@@ -308,4 +347,6 @@ BENCHMARK(BM_split_t)->DenseRange(0,32,4);
 BENCHMARK(BM_splitc)->DenseRange(0,32,4);
 BENCHMARK(BM_splite)->DenseRange(0,32,4);
 BENCHMARK(BM_splitec)->DenseRange(0,32,4);
+BENCHMARK(BM_splitenullc)->DenseRange(0,32,4);
+BENCHMARK(BM_splitenullsv)->DenseRange(0,32,4);
 BENCHMARK_MAIN();
