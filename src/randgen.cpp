@@ -1,7 +1,3 @@
-//
-// Created by Abhishek Lekshmanan on 05/02/2022.
-//
-
 #include <random>
 #include "benchmark/benchmark.h"
 #include <algorithm>
@@ -17,8 +13,8 @@ auto generate_vec(size_t sz, T start=0,
 {
     std::vector<T> v;
     v.resize(sz);
-    std::generate(v.begin(), v.end(), [start, end]() {
-        std::uniform_int_distribution<T> distrib(start, end);
+    std::uniform_int_distribution<T> distrib(start, end);
+    std::generate(v.begin(), v.end(), [&distrib]() {
         return distrib(generator);
     });
     return v;
@@ -90,7 +86,7 @@ static void BM_uint64_high_threshold(benchmark::State& state)
     }
 }
 int64_t start = 8;
-int64_t end = 1<<24UL;
+int64_t end = 1UL<<24;
 BENCHMARK(BM_uint32_low_threshold)->Range(start, end);
 BENCHMARK(BM_uint32_mid_threshold)->Range(start, end);
 BENCHMARK(BM_uint32_high_threshold)->Range(start, end);
