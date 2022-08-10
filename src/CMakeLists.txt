@@ -6,3 +6,9 @@ target_link_libraries(strsplit PRIVATE benchmark::benchmark)
 
 add_executable(randgen randgen.cpp)
 target_link_libraries(randgen PRIVATE benchmark::benchmark)
+
+add_executable(strtoint strtoint.cpp)
+target_link_libraries(strtoint PRIVATE benchmark::benchmark)
+
+add_executable(mapfilter mapfilter.cpp)
+target_link_libraries(mapfilter PRIVATE benchmark::benchmark)

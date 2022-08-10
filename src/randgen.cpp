@@ -87,10 +87,10 @@ static void BM_uint64_high_threshold(benchmark::State& state)
 }
 int64_t start = 8;
 int64_t end = 1UL<<24;
-BENCHMARK(BM_uint32_low_threshold)->Range(start, end);
-BENCHMARK(BM_uint32_mid_threshold)->Range(start, end);
-BENCHMARK(BM_uint32_high_threshold)->Range(start, end);
-BENCHMARK(BM_uint64_low_threshold)->Range(start, end);
-BENCHMARK(BM_uint64_mid_threshold)->Range(start, end);
-BENCHMARK(BM_uint64_high_threshold)->Range(start, end);
+BENCHMARK(BM_uint32_low_threshold)->Range(start, end)->Unit(benchmark::kMicrosecond);
+BENCHMARK(BM_uint32_mid_threshold)->Range(start, end)->Unit(benchmark::kMicrosecond);
+BENCHMARK(BM_uint32_high_threshold)->Range(start, end)->Unit(benchmark::kMicrosecond);
+BENCHMARK(BM_uint64_low_threshold)->Range(start, end)->Unit(benchmark::kMicrosecond);
+BENCHMARK(BM_uint64_mid_threshold)->Range(start, end)->Unit(benchmark::kMicrosecond);
+BENCHMARK(BM_uint64_high_threshold)->Range(start, end)->Unit(benchmark::kMicrosecond);
 BENCHMARK_MAIN();
