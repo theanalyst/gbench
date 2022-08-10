@@ -99,6 +99,10 @@ const std::vector<std::string> Policy::gBasePolicyKeys = {
   "policy.localredirect"
 };
 
+static std::string POLICY_BANDWIDTH="policy.bandwidth";
+static std::string POLICY_IOPRIORITY="policy.iopriority";
+static std::string POLICY_IOTYPE = "policy.iotype";
+static std::string POLICY_SCHEDULE="policy.schedule";
 const std::vector<std::string> Policy::gBasePolicyRWKeys = {
   "policy.bandwidth",
   "policy.iopriority",
@@ -192,6 +196,12 @@ static void BM_GetConfigKeys(benchmark::State& state) {
   }
 }
 
+struct UserParams {
+  std::string user_key;
+  std::string group_key;
+  std::string app_key;
+};
+
 static void BM_PopGetConfigValues(benchmark::State& state) {
   std::map <std::string, std::string> spacepolicies;
   std::vector<std::string> keys;
@@ -214,16 +224,14 @@ static void BM_PopGetConfigValues(benchmark::State& state) {
                                                               "dummy" + std::to_string(state.range(0))));
     }
 
-
-    benchmark::DoNotOptimize(schedule = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.schedule", rw, is_local),
+    benchmark::DoNotOptimize(schedule = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_SCHEDULE, rw, is_local),
                                                            user_key, group_key, app_key) == "1");
-    benchmark::DoNotOptimize(iopriority = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.iopriority", rw, is_local),
-                                                     user_key, group_key, app_key));
-    benchmark::DoNotOptimize(iotype = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.iotype", rw, is_local),
-                                                 user_key, group_key, app_key));
-    benchmark::DoNotOptimize(bandwidth = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.bandwidth", rw, is_local),
+    benchmark::DoNotOptimize(iopriority = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_IOPRIORITY, rw, is_local),
+                                                             user_key, group_key, app_key));
+    benchmark::DoNotOptimize(iotype = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_IOTYPE, rw, is_local),
+                                                         user_key, group_key, app_key));
+    benchmark::DoNotOptimize(bandwidth = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_BANDWIDTH, rw, is_local),
                                                             user_key, group_key, app_key));
-
   }
 
 }
@@ -257,16 +265,14 @@ static void BM_GetConfigValues(benchmark::State& state) {
   }
 
   for (auto _: state) {
-
-    benchmark::DoNotOptimize(schedule = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.schedule", rw, is_local),
+    benchmark::DoNotOptimize(schedule = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_SCHEDULE, rw, is_local),
                                                            user_key, group_key, app_key) == "1");
-    benchmark::DoNotOptimize(iopriority = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.iopriority", rw, is_local),
-                                                     user_key, group_key, app_key));
-    benchmark::DoNotOptimize(iotype = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.iotype", rw, is_local),
-                                                 user_key, group_key, app_key));
-    benchmark::DoNotOptimize(bandwidth = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.bandwidth", rw, is_local),
+    benchmark::DoNotOptimize(iopriority = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_IOPRIORITY, rw, is_local),
+                                                             user_key, group_key, app_key));
+    benchmark::DoNotOptimize(iotype = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_IOTYPE, rw, is_local),
+                                                         user_key, group_key, app_key));
+    benchmark::DoNotOptimize(bandwidth = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_BANDWIDTH, rw, is_local),
                                                             user_key, group_key, app_key));
-
   }
 
 }
@@ -303,13 +309,13 @@ static void BM_GetConfigValuesErase(benchmark::State& state) {
     eos::common::erase_if(spacepolicies, [](const auto& kv) {
       return kv.second.empty();
     });
-    benchmark::DoNotOptimize(schedule = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.schedule", rw, is_local),
+    benchmark::DoNotOptimize(schedule = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_SCHEDULE, rw, is_local),
                                                            user_key, group_key, app_key) == "1");
-    benchmark::DoNotOptimize(iopriority = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.iopriority", rw, is_local),
-                                                     user_key, group_key, app_key));
-    benchmark::DoNotOptimize(iotype = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.iotype", rw, is_local),
-                                                 user_key, group_key, app_key));
-    benchmark::DoNotOptimize(bandwidth = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.bandwidth", rw, is_local),
+    benchmark::DoNotOptimize(iopriority = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_IOPRIORITY, rw, is_local),
+                                                             user_key, group_key, app_key));
+    benchmark::DoNotOptimize(iotype = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_IOTYPE, rw, is_local),
+                                                         user_key, group_key, app_key));
+    benchmark::DoNotOptimize(bandwidth = Policy::GetRWValue(spacepolicies, Policy::getRWkey(POLICY_BANDWIDTH, rw, is_local),
                                                             user_key, group_key, app_key));
 
   }
