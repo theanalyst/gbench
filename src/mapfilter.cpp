@@ -199,8 +199,53 @@ static void BM_PopGetConfigValues(benchmark::State& state) {
 
 }
 
+static void BM_GetConfigValues(benchmark::State& state) {
+  std::map <std::string, std::string> spacepolicies;
+  std::vector<std::string> keys;
+  bool schedule;
+  std::string iopriority, iotype, bandwidth;
+  using namespace std::string_literals;
+  std::string user_key = ".user:user"s + std::to_string(state.range(0));
+  std::string group_key = ".group:group"s + std::to_string(state.range(0));
+  std::string app_key = ".app:app"s + std::to_string(state.range(0));
+  bool rw=true;
+  bool is_local=true;
+  keys =Policy::GetConfigKeys(user_key,
+                              group_key,
+                              app_key,
+                              true,
+                              true);
+  for (const auto& k: keys) {
+    if ((k.find(user_key) != std::string::npos) ||
+        (k.find(group_key) != std::string::npos) ||
+        (k.find(app_key) != std::string::npos)) {
+      spacepolicies.insert_or_assign(k,
+                                     "dummy" + std::to_string(state.range(0)));
+
+    } else {
+      spacepolicies.insert_or_assign(k, "");
+    }
+  }
+
+  for (auto _: state) {
+
+    benchmark::DoNotOptimize(schedule = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.schedule", rw, is_local),
+                                                           user_key, group_key, app_key) == "1");
+    benchmark::DoNotOptimize(iopriority = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.iopriority", rw, is_local),
+                                                     user_key, group_key, app_key));
+    benchmark::DoNotOptimize(iotype = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.iotype", rw, is_local),
+                                                 user_key, group_key, app_key));
+    benchmark::DoNotOptimize(bandwidth = Policy::GetRWValue(spacepolicies, Policy::getRWkey("policy.bandwidth", rw, is_local),
+                                                            user_key, group_key, app_key));
+
+  }
+
+}
+
 
 
 BENCHMARK(BM_GetConfigKeys);
 BENCHMARK(BM_PopGetConfigValues)->Range(1,1<<20);
+BENCHMARK(BM_GetConfigValues)->Range(1,1<<20);
+
 BENCHMARK_MAIN();
