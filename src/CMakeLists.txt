@@ -12,3 +12,6 @@ target_link_libraries(strtoint PRIVATE benchmark::benchmark)
 
 add_executable(mapfilter mapfilter.cpp)
 target_link_libraries(mapfilter PRIVATE benchmark::benchmark)
+
+add_executable(xrdstring XrdCppString.cpp XrdOucString.cc)
+target_link_libraries(xrdstring PRIVATE benchmark::benchmark)
